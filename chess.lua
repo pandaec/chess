@@ -30,11 +30,11 @@ end
 function Chess:selectedDraw()
     love.graphics.push()
     love.graphics.setColor(0,191,255,255)
-    
+
     love.graphics.rectangle("fill",self.x,self.y,60,60)
     love.graphics.draw(sChess,self.imgSrc,self.x,self.y)
-    
-    
+
+
     love.graphics.setColor(255,255,255,255) --revert colour change
     love.graphics.pop()
 end

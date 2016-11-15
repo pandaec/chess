@@ -19,15 +19,15 @@ local chessDef = {
     {["x"]=4,["y"]=8,["side"]='W',["piece"]='queen',["dead"]=false},
     {["x"]=3,["y"]=8,["side"]='W',["piece"]='bishop',["dead"]=false},
     {["x"]=2,["y"]=8,["side"]='W',["piece"]='knight',["dead"]=false},
-    {["x"]=4,["y"]=5,["side"]='W',["piece"]='rook',["dead"]=false},
+    {["x"]=1,["y"]=8,["side"]='W',["piece"]='rook',["dead"]=false},
 
-    {["x"]=8,["y"]=5,["side"]='W',["piece"]='pawn',["dead"]=false},
+    {["x"]=8,["y"]=7,["side"]='W',["piece"]='pawn',["dead"]=false},
     {["x"]=7,["y"]=7,["side"]='W',["piece"]='pawn',["dead"]=false},
     {["x"]=6,["y"]=7,["side"]='W',["piece"]='pawn',["dead"]=false},
     {["x"]=5,["y"]=7,["side"]='W',["piece"]='pawn',["dead"]=false},
     {["x"]=4,["y"]=7,["side"]='W',["piece"]='pawn',["dead"]=false},
     {["x"]=3,["y"]=7,["side"]='W',["piece"]='pawn',["dead"]=false},
-    {["x"]=2,["y"]=5,["side"]='W',["piece"]='pawn',["dead"]=false},
+    {["x"]=2,["y"]=7,["side"]='W',["piece"]='pawn',["dead"]=false},
     {["x"]=1,["y"]=7,["side"]='W',["piece"]='pawn',["dead"]=false},
 
 
@@ -35,9 +35,9 @@ local chessDef = {
     {["x"]=7,["y"]=1,["side"]='B',["piece"]='knight',["dead"]=false},
     {["x"]=6,["y"]=1,["side"]='B',["piece"]='bishop',["dead"]=false},
     {["x"]=5,["y"]=1,["side"]='B',["piece"]='king',["dead"]=false},
-    {["x"]=6,["y"]=5,["side"]='B',["piece"]='queen',["dead"]=false},
+    {["x"]=4,["y"]=1,["side"]='B',["piece"]='queen',["dead"]=false},
     {["x"]=3,["y"]=1,["side"]='B',["piece"]='bishop',["dead"]=false},
-    {["x"]=5,["y"]=5,["side"]='B',["piece"]='knight',["dead"]=false},
+    {["x"]=2,["y"]=1,["side"]='B',["piece"]='knight',["dead"]=false},
     {["x"]=1,["y"]=1,["side"]='B',["piece"]='rook',["dead"]=false},
 
     {["x"]=8,["y"]=2,["side"]='B',["piece"]='pawn',["dead"]=false},
@@ -54,7 +54,7 @@ local allChess = {}
 
 function love.load(arg)
     if arg[#arg] == "-debug" then require("mobdebug").start() end
-    
+
     love.graphics.setBackgroundColor(255, 255, 255, 1)
     local allQuad = {}
     sChess = love.graphics.newImage("chess.png")
@@ -80,7 +80,6 @@ function love.load(arg)
                 ["sWking"]=sWking,["sWqueen"]=sWqueen,["sWrook"]=sWrook,["sWbishop"]=sWbishop,["sWknight"]=sWknight,["sWpawn"]=sWpawn}
 
 
-    
     for i=1,#chessDef,1 do
         local c = chessDef[i]
         allChess[i] = Chess.new((c.x-1)*60+xoffset,(c.y-1)*60+yoffset,c.side,c.piece,c.dead,allQuad)
@@ -89,16 +88,16 @@ function love.load(arg)
     b = Board.new(allChess)
 
     font = love.graphics.newFont(35)
-    blackCount = love.graphics.newText(font, "blackCount!!??!?!?")
-    whiteCount = love.graphics.newText(font, "whiteCount")
+    blackCount = love.graphics.newText(font, "Black remain:16")
+    whiteCount = love.graphics.newText(font, "White remain:16")
 end
 
-local ci --curent selected chess index
+local ci --curent selected chess indexl
 
 function love.draw()
-    
+
     b:draw()
-    
+
     for i=1,#allChess,1 do
       if i ~= ci then
         allChess[i]:draw()
@@ -106,12 +105,12 @@ function love.draw()
         allChess[i]:selectedDraw()
       end
     end
-    
-    if moveset~= nil then 
+
+    if moveset~= nil then
       b:drawPossibleMove(moveset)
     end
 
-    
+
     love.graphics.setColor(0,0,0,255)
     love.graphics.draw(blackCount,xoffset,yoffset-35)
     love.graphics.draw(whiteCount,xoffset,screenHeight-yoffset)
@@ -121,9 +120,9 @@ local pi = ci
 function love.update()
     mx = love.mouse.getX()
     my = love.mouse.getY()
-    
+
     local selected
-    
+
     if love.mouse.isDown(1) then
       local selectedIndex = findSelectedChess(mx,my)
       if selectedIndex <= #allChess and selectedIndex > 0 then
@@ -141,7 +140,7 @@ end
 
 function love.mousepressed(x,y,button,istouch)
     local boardPos = screenPosToBoardPos(x,y)
-    
+
     if button == 2 and isInMoveset(boardPos[1],boardPos[2]) then
         local chess = allChess[ci]
         print(chess)
@@ -149,7 +148,7 @@ function love.mousepressed(x,y,button,istouch)
         eatChess(chess,boardPos[1],boardPos[2])
 
         moveChess(chess,boardPos[1],boardPos[2])
-        
+
         --reset chosen piece aka current index
         ci = nil
         pi = nil

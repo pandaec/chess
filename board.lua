@@ -8,17 +8,17 @@ local HEIGHT = 8
 function Board.new(allChess)
     local b = {}
     setmetatable(b,Board)
-    
+
     --init board as 8x8 table
     b.board = {}
     for i=1,WIDTH,1 do
         b.board[i] = {}
     end
-    
+
     for i=1,#allChess,1 do
       local c = allChess[i]
       b.board[c.boardx][c.boardy] = c
-      
+
     end
 
     b.x = xoffset --screen x
@@ -40,18 +40,30 @@ function Board:draw()
             end
 
             love.graphics.rectangle("fill",self.x+60*(i-1),self.y+60*(j-1),60,60)
-            
+
         end
     end
 end
 
 function Board:possibleMove(chess)
     if chess.piece == 'pawn' and chess.side == 'W' then
-        return {{chess.boardx,chess.boardy-1}}
+        if chess.boardy == 7 then
+            return {{chess.boardx,chess.boardy-1},{chess.boardx,chess.boardy-2}}
+          else
+            if chess.boardy-1 > 0 then
+              return {{chess.boardx,chess.boardy-1}}
+            end
+          end
     end
-    
+
     if chess.piece == 'pawn' and chess.side == 'B' then
-        return {{chess.boardx, chess.boardy+1}}
+        if chess.boardy == 2 then
+          return {{chess.boardx,chess.boardy+1},{chess.boardx,chess.boardy+2}}
+        else
+          if chess.boardy+1 <=8 then
+            return {{chess.boardx, chess.boardy+1}}
+          end
+        end
     end
 
     if chess.piece == "rook" then
@@ -84,7 +96,7 @@ function Board:possibleMove(chess)
                 end
             end
         end
-        
+
 
         for i=chess.boardx+1, 8, 1 do
             if i>0 then
@@ -110,7 +122,7 @@ function Board:possibleMove(chess)
                 elseif checkSide == "diff" then
                     table.insert(moves,{i,chess.boardy})
                     break
-                end            
+                end
             end
         end
 
@@ -134,7 +146,7 @@ function Board:possibleMove(chess)
             end
             if chess.boardy+2 <= 8 and self:checkCollision(chess,chess.boardx-1,chess.boardy+2)~="same"
                 then table.insert(moves,{chess.boardx-1,chess.boardy+2})
-            end      
+            end
         end
 
         if chess.boardx-2>0 then
@@ -159,7 +171,7 @@ function Board:possibleMove(chess)
 
     if chess.piece == "bishop" then
         local moves = {}
-        
+
         for i=1,8,1 do
             if chess.boardx+i <= 8 and chess.boardy+i <= 8 then
                 local checkSide = self:checkCollision(chess,chess.boardx+i,chess.boardy+i)
@@ -189,7 +201,7 @@ function Board:possibleMove(chess)
         end
 
         for i=1,8,1 do
-            if chess.boardx+i <= 8 and chess.boardy-i > 0 then 
+            if chess.boardx+i <= 8 and chess.boardy-i > 0 then
                 local checkSide = self:checkCollision(chess,chess.boardx+i,chess.boardy-i)
                 if checkSide == nil then
                     table.insert(moves,{chess.boardx+i,chess.boardy-i})
@@ -212,7 +224,7 @@ function Board:possibleMove(chess)
                 elseif checkSide == "diff" then
                     table.insert(moves,{chess.boardx-i,chess.boardy-i})
                     break
-                end            
+                end
             end
         end
 
@@ -266,7 +278,7 @@ function Board:possibleMove(chess)
         end
 
         for i=1,8,1 do
-            if chess.boardx+i <= 8 and chess.boardy-i > 0 then 
+            if chess.boardx+i <= 8 and chess.boardy-i > 0 then
                 local checkSide = self:checkCollision(chess,chess.boardx+i,chess.boardy-i)
                 if checkSide == nil then
                     table.insert(moves,{chess.boardx+i,chess.boardy-i})
@@ -289,10 +301,10 @@ function Board:possibleMove(chess)
                 elseif checkSide == "diff" then
                     table.insert(moves,{chess.boardx-i,chess.boardy-i})
                     break
-                end            
+                end
             end
         end
-        
+
         --move horizontal and vertical
         for i=chess.boardy-1, 1, -1 do
             if i > 0 then
@@ -321,7 +333,7 @@ function Board:possibleMove(chess)
                 end
             end
         end
-        
+
 
         for i=chess.boardx+1, 8, 1 do
             if i>0 then
@@ -347,10 +359,10 @@ function Board:possibleMove(chess)
                 elseif checkSide == "diff" then
                     table.insert(moves,{i,chess.boardy})
                     break
-                end            
+                end
             end
         end
-        
+
         return moves
     end
 end
