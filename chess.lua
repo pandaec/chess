@@ -2,7 +2,7 @@ local Chess = {}
 setmetatable(Chess,{})
 Chess.__index = Chess
 
-function Chess.new(x,y,side,piece,dead,allQuad)
+function Chess.new(x,y,side,piece,dead)
     local c = {}
     setmetatable(c,Chess)
 

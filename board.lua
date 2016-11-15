@@ -47,23 +47,61 @@ end
 
 function Board:possibleMove(chess)
     if chess.piece == 'pawn' and chess.side == 'W' then
-        if chess.boardy == 7 then
-            return {{chess.boardx,chess.boardy-1},{chess.boardx,chess.boardy-2}}
-          else
-            if chess.boardy-1 > 0 then
-              return {{chess.boardx,chess.boardy-1}}
-            end
-          end
+        local moves = {}
+        
+        --change to queen when reach bottom
+        if chess.boardy == 1 then self:chessChange(chess,"queen") end
+        
+        --allow to move 2 step at start
+        if chess.boardy == 7 then 
+          table.insert(moves,{chess.boardx,chess.boardy-1})
+          table.insert(moves,{chess.boardx,chess.boardy-2})
+        end
+
+        
+        --check y-1>0
+        if chess.boardy-1 > 0 and self:checkCollision(chess,chess.boardx,chess.boardy-1)==nil then
+          table.insert(moves,{chess.boardx,chess.boardy-1})
+        end
+        
+        if chess.boardx+1 <= 8 and chess.boardy-1 > 0 and self:checkCollision(chess,chess.boardx+1,chess.boardy-1)=='diff' then
+          table.insert(moves,{chess.boardx+1,chess.boardy-1})
+        end
+        
+        if chess.boardx-1 > 0 and chess.boardy-1 > 0 and self:checkCollision(chess,chess.boardx-1,chess.boardy-1)=='diff' then
+          table.insert(moves,{chess.boardx-1,chess.boardy-1})
+        end
+        
+        return moves
     end
 
     if chess.piece == 'pawn' and chess.side == 'B' then
-        if chess.boardy == 2 then
-          return {{chess.boardx,chess.boardy+1},{chess.boardx,chess.boardy+2}}
-        else
-          if chess.boardy+1 <=8 then
-            return {{chess.boardx, chess.boardy+1}}
-          end
+        local moves = {}
+        
+        --change to queen when reach bottom
+        if chess.boardy == 8 then self:chessChange(chess,"queen") end
+        
+        --allow to move 2 step at start
+        if chess.boardy == 2 then 
+          table.insert(moves,{chess.boardx,chess.boardy+1})
+          table.insert(moves,{chess.boardx,chess.boardy+2})
         end
+
+        
+        --check y-1>0
+        if chess.boardy+1 <= 8 and self:checkCollision(chess,chess.boardx,chess.boardy+1)==nil then
+          table.insert(moves,{chess.boardx,chess.boardy+1})
+        end
+        
+        if chess.boardx+1 <= 8 and chess.boardy+1 > 0 and self:checkCollision(chess,chess.boardx+1,chess.boardy+1)=='diff' then
+          table.insert(moves,{chess.boardx+1,chess.boardy+1})
+        end
+        
+        if chess.boardx-1 > 0 and chess.boardy+1 <= 8 and self:checkCollision(chess,chess.boardx-1,chess.boardy+1)=='diff' then
+          table.insert(moves,{chess.boardx-1,chess.boardy+1})
+        end
+        
+        return moves
     end
 
     if chess.piece == "rook" then
@@ -378,6 +416,12 @@ function Board:checkCollision(chess,bx,by)
     if self.board[bx][by] == nil then return nil end
     if self.board[bx][by].side == chess.side then return "same" end
     if self.board[bx][by].side ~= chess.side then return "diff" end
+end
+
+function Board:chessChange(chess,piece)
+    chess.piece = piece
+    local imgSrc = 's' .. chess.side .. piece
+    chess.imgSrc = allQuad[imgSrc]
 end
 
 

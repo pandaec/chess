@@ -8,8 +8,11 @@ local screenHeight = love.graphics.getHeight()
 xoffset = (screenWidth-8*60)/2 --center of board
 yoffset = (screenHeight-8*60)/2 --center of board
 
+local round = 1
+
 local b
 local moveset
+local winText
 
 local chessDef = {
     {["x"]=8,["y"]=8,["side"]='W',["piece"]='rook',["dead"]=false},
@@ -51,12 +54,11 @@ local chessDef = {
 }
 
 local allChess = {}
-
+allQuad = {}
 function love.load(arg)
     if arg[#arg] == "-debug" then require("mobdebug").start() end
 
     love.graphics.setBackgroundColor(255, 255, 255, 1)
-    local allQuad = {}
     sChess = love.graphics.newImage("chess.png")
 
     sBking = love.graphics.newQuad(0,0,60,60,sChess:getDimensions())
@@ -90,6 +92,8 @@ function love.load(arg)
     font = love.graphics.newFont(35)
     blackCount = love.graphics.newText(font, "Black remain:16")
     whiteCount = love.graphics.newText(font, "White remain:16")
+    roundText = love.graphics.newText(font, "White's Turn")
+    winText = love.graphics.newText(font,"Side Win!!")
 end
 
 local ci --curent selected chess indexl
@@ -114,6 +118,21 @@ function love.draw()
     love.graphics.setColor(0,0,0,255)
     love.graphics.draw(blackCount,xoffset,yoffset-35)
     love.graphics.draw(whiteCount,xoffset,screenHeight-yoffset)
+    love.graphics.draw(roundText,xoffset,10)
+    
+    
+    if checkWin()~='' then
+        local w,h = winText:getDimensions()
+        love.graphics.push()
+        print(h)
+        love.graphics.scale(2,2)
+        love.graphics.draw(winText,150/2,300/2)
+        
+        love.graphics.pop()
+        
+    end
+    
+    love.graphics.line(0,screenHeight/2,screenWidth,screenHeight/2)
 end
 
 local pi = ci
@@ -143,7 +162,6 @@ function love.mousepressed(x,y,button,istouch)
 
     if button == 2 and isInMoveset(boardPos[1],boardPos[2]) then
         local chess = allChess[ci]
-        print(chess)
         --check if position is occupied
         eatChess(chess,boardPos[1],boardPos[2])
 
@@ -159,13 +177,16 @@ end
 
 --callback when selected chess change
 function selectedChange()
-  print("CHANGE!!" .. ci)
   moveset = b:possibleMove(allChess[ci])
 end
 
 function findSelectedChess(mx,my)
     for i=1,#allChess,1 do
-      if allChess[i]:checkMouseOn(mx,my) then return i
+      if allChess[i]:checkMouseOn(mx,my) then
+        --only selected when it is their turn
+        if round%2 == 1 and allChess[i].side == 'W' or round%2 == 0 and allChess[i].side == 'B' then
+          return i
+        end
       end
     end
     return -1
@@ -200,11 +221,16 @@ function moveChess(chess,bx,by)
 
     b.board[bx][by] = chess
     b.board[prevx][prevy] = nil
+   
+    if checkWin()=="white" then winText:set("White Win!!") end
+    if checkWin()=="black" then winText:set("Black Win!!") end   
+   
+    round = round + 1
+    changeRoundText()
 end
 
 function eatChess(chess,bx,by)
     local checkSide = b:checkCollision(chess,bx,by)
-    print(checkSide)
     if checkSide == "diff" then
         --goodest programming
         --dont draw dead piece and move them offscreen
@@ -228,4 +254,16 @@ end
 function updateDeadCount()
     blackCount:set("Black remain:" .. 16 - countDead('B'))
     whiteCount:set("White remain:" .. 16 - countDead('W'))
+end
+
+function changeRoundText()
+    if round%2 == 1 then roundText:set("White's turn") end
+    if round%2 == 0 then roundText:set("Black's turn") end
+end
+
+function checkWin()
+    local winningteam = ''
+    if countDead('W') == 16 or allChess[4].dead then return 'black' end
+    if countDead('B') == 16 or allChess[20].dead then return 'white' end
+    return ''
 end
