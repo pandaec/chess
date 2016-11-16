@@ -50,7 +50,7 @@ local chessDef = {
     {["x"]=4,["y"]=2,["side"]='B',["piece"]='pawn',["dead"]=false},
     {["x"]=3,["y"]=2,["side"]='B',["piece"]='pawn',["dead"]=false},
     {["x"]=2,["y"]=2,["side"]='B',["piece"]='pawn',["dead"]=false},
-    {["x"]=1,["y"]=5,["side"]='B',["piece"]='pawn',["dead"]=false},
+    {["x"]=1,["y"]=2,["side"]='B',["piece"]='pawn',["dead"]=false},
 }
 
 local allChess = {}
@@ -119,20 +119,19 @@ function love.draw()
     love.graphics.draw(blackCount,xoffset,yoffset-35)
     love.graphics.draw(whiteCount,xoffset,screenHeight-yoffset)
     love.graphics.draw(roundText,xoffset,10)
-    
-    
+
+
     if checkWin()~='' then
         local w,h = winText:getDimensions()
         love.graphics.push()
         print(h)
         love.graphics.scale(2,2)
         love.graphics.draw(winText,150/2,300/2)
-        
+
         love.graphics.pop()
-        
+
     end
-    
-    love.graphics.line(0,screenHeight/2,screenWidth,screenHeight/2)
+
 end
 
 local pi = ci
@@ -221,10 +220,10 @@ function moveChess(chess,bx,by)
 
     b.board[bx][by] = chess
     b.board[prevx][prevy] = nil
-   
+
     if checkWin()=="white" then winText:set("White Win!!") end
-    if checkWin()=="black" then winText:set("Black Win!!") end   
-   
+    if checkWin()=="black" then winText:set("Black Win!!") end
+
     round = round + 1
     changeRoundText()
 end
